@@ -35,7 +35,7 @@
 
 ## Overview
 
-The system is a railway reservation platform split into four independently deployable Spring Boot services: **authentication**, **booking**, **payment** and **notification**. A React + TypeScript frontend is served by Nginx. Each service runs as its own task on an **Amazon ECS cluster using AWS Fargate**, sits behind an internet-facing **Application Load Balancer**, owns a separate **PostgreSQL** database on **Amazon RDS**, and talks to the other services asynchronously through **Amazon MSK Serverless** (Apache Kafka).
+The system is a railway reservation platform split into four independently deployable Spring Boot services: **authentication**, **booking**, **payment** and **notification**. Each service runs as its own task on an **Amazon ECS cluster using AWS Fargate**, sits behind an internet-facing **Application Load Balancer**, owns a separate **PostgreSQL** database on **Amazon RDS**, and talks to the other services asynchronously through **Amazon MSK Serverless** (Apache Kafka).
 
 The project studies how a microservice workload can be split so that compute, cache, search and database capacity can each be **allocated and scaled independently** instead of scaling a single monolith.
 
@@ -62,7 +62,6 @@ The project studies how a microservice workload can be split so that compute, ca
 
 | Path prefix | Target ECS service | Container port |
 |---|---|---|
-| `/` | frontend (React + Nginx) | 80 |
 | `/auth/*`, `/profile/*` | auth-service | 8080 |
 | `/api/trains/*`, `/booking/*` | booking-service | 8082 |
 | `/api/payments/*` | payment-service | 8083 |
@@ -102,7 +101,6 @@ Each service lives in its own repository and is included here as a **git submodu
 | **Booking** | [`booking_service`](https://github.com/bhushanrkashyap/booking_service) | 8082 | Train search, station suggestions, seat availability, seat allocation by berth preference, PNR generation, booking lifecycle, travel reminders | RDS `booking_service`, ElastiCache, Elasticsearch, MSK |
 | **Payment** | [`payment_service`](https://github.com/bhushanrkashyap/payment_service) | 8083 | Payment initiation, Razorpay and sandbox gateways, webhook verification, idempotency, payment-window expiry, recovery of stuck payments | RDS `payment_service`, MSK |
 | **Notification** | [`notification_service`](https://github.com/bhushanrkashyap/notification_service) | 8081 | Event-driven e-mails, PDF ticket generation, S3 storage with presigned URLs, retry and scheduled reminders, per-recipient rate limiting | RDS `notification_service`, MSK, S3 |
-| **Frontend** | separate repository | 80 | React 19 + TypeScript + Vite single-page app served by Nginx | - |
 
 **Shared stack:** Java 21, Spring Boot 4.1 (notification-service on 3.2), Spring Security, Spring Data JPA, Flyway, Spring Kafka, Bucket4j, JJWT, OpenPDF/PDFBox, AWS SDK v2, Maven, multi-stage Docker images (Temurin 21 JRE on Alpine, non-root user, health checks).
 
@@ -112,7 +110,7 @@ Each service lives in its own repository and is included here as a **git submodu
 
 | Layer | Service | Role in the system |
 |---|---|---|
-| Compute | **Amazon ECS on AWS Fargate** | Runs the five containerised services (`train-ticket-cluster`) without managing servers |
+| Compute | **Amazon ECS on AWS Fargate** | Runs the four containerised microservices (`train-ticket-cluster`) without managing servers |
 | Networking | **Application Load Balancer** | Internet-facing entry point (`train-ticket-alb`) with path-based routing and target-group health checks |
 | Networking | **Amazon VPC**, Internet gateway, NAT gateway | Public / private subnet isolation and controlled egress |
 | Database | **Amazon RDS for PostgreSQL** | Database-per-service: `auth_service`, `booking_service`, `payment_service`, `notification_service` |
@@ -263,7 +261,7 @@ Every setting is read from environment variables (see each service's `applicatio
 The production environment runs in **`us-east-1`**:
 
 1. Each service is built into a multi-stage Docker image and pushed to its **Amazon ECR** repository.
-2. The **ECS cluster** `train-ticket-cluster` runs one **Fargate** service per component (5 services). Each task definition references its ECR image, a CloudWatch Logs group, and secrets stored in **AWS Secrets Manager**.
+2. The **ECS cluster** `train-ticket-cluster` runs one **Fargate** service per microservice (4 services). Each task definition references its ECR image, a CloudWatch Logs group, and secrets stored in **AWS Secrets Manager**.
 3. The **Application Load Balancer** `train-ticket-alb` forwards requests to the per-service target groups and health-checks `/actuator/health`.
 4. Services connect to **Amazon RDS for PostgreSQL** (TLS), **Amazon ElastiCache** (`REDIS_SSL_ENABLED=true`), **Amazon MSK Serverless** (`SASL_SSL` + `AWS_MSK_IAM`) and **Amazon S3** using their IAM task roles.
 5. Rolling updates are done by registering a new task-definition revision and updating the ECS service. ECS replaces tasks only after the new ones pass their health checks.
