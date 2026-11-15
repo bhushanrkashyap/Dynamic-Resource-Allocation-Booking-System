@@ -6,3 +6,7 @@
 	path = services/booking-service
 	url = https://github.com/bhushanrkashyap/booking_service.git
 	branch = main
+[submodule "services/payment-service"]
+	path = services/payment-service
+	url = https://github.com/bhushanrkashyap/payment_service.git
+	branch = main
