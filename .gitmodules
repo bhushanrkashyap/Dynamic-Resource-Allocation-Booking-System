@@ -1,0 +1,4 @@
+[submodule "services/authentication-service"]
+	path = services/authentication-service
+	url = https://github.com/bhushanrkashyap/authentication_service.git
+	branch = main
