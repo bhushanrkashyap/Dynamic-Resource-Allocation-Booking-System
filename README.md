@@ -13,9 +13,6 @@
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.19-005571?logo=elasticsearch&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-multi--stage-2496ED?logo=docker&logoColor=white)
 
-*Final-year B.E. (Computer Science & Engineering) major project, Global Academy of Technology, Bengaluru (VTU), 2026-27*
-*Project theme: Dynamic Resource Allocation and Intelligent Auto-Scaling Using AWS Services*
-
 </div>
 
 ---
@@ -32,8 +29,7 @@
 8. [Repository layout](#repository-layout)
 9. [Getting started](#getting-started)
 10. [Deployment](#deployment)
-11. [Research context and future work](#research-context-and-future-work)
-12. [Team](#team)
+11. [Future work](#future-work)
 
 ---
 
@@ -106,7 +102,7 @@ Each service lives in its own repository and is included here as a **git submodu
 | **Booking** | [`booking_service`](https://github.com/bhushanrkashyap/booking_service) | 8082 | Train search, station suggestions, seat availability, seat allocation by berth preference, PNR generation, booking lifecycle, travel reminders | RDS `booking_service`, ElastiCache, Elasticsearch, MSK |
 | **Payment** | [`payment_service`](https://github.com/bhushanrkashyap/payment_service) | 8083 | Payment initiation, Razorpay and sandbox gateways, webhook verification, idempotency, payment-window expiry, recovery of stuck payments | RDS `payment_service`, MSK |
 | **Notification** | [`notification_service`](https://github.com/bhushanrkashyap/notification_service) | 8081 | Event-driven e-mails, PDF ticket generation, S3 storage with presigned URLs, retry and scheduled reminders, per-recipient rate limiting | RDS `notification_service`, MSK, S3 |
-| **Frontend** | [`Dynamic-Resource-allocation`](https://github.com/Bharathmn-2005/Dynamic-Resource-allocation) (team repo) | 80 | React 19 + TypeScript + Vite single-page app served by Nginx | - |
+| **Frontend** | separate repository | 80 | React 19 + TypeScript + Vite single-page app served by Nginx | - |
 
 **Shared stack:** Java 21, Spring Boot 4.1 (notification-service on 3.2), Spring Security, Spring Data JPA, Flyway, Spring Kafka, Bucket4j, JJWT, OpenPDF/PDFBox, AWS SDK v2, Maven, multi-stage Docker images (Temurin 21 JRE on Alpine, non-root user, health checks).
 
@@ -276,11 +272,9 @@ An earlier iteration ran the full stack on a single Ubuntu EC2 instance with Doc
 
 ---
 
-## Research context and future work
+## Future work
 
-This repository is the implementation half of the major project **"Dynamic Resource Allocation and Intelligent Auto-Scaling Using AWS Services"**. The microservice split, the database-per-service design and the managed data tier are the foundation for scaling each component on its own signals, instead of over-provisioning a single host.
-
-Areas identified for further work in the project report:
+The microservice split, the database-per-service design and the managed data tier are the foundation for scaling each component on its own signals, instead of over-provisioning a single host. Planned next steps:
 
 - **Metric-driven auto-scaling.** ECS Service Auto Scaling with target tracking on CPU, memory and ALB `RequestCountPerTarget`, validated under controlled load tests (JMeter / Locust).
 - **Predictive scaling.** Forecasting demand from CloudWatch metrics (for example LSTM forecasts with an HMM workload-state classifier) to scale ahead of peak booking windows such as Tatkal hours.
@@ -288,22 +282,3 @@ Areas identified for further work in the project report:
 - **Distributed locking.** Moving per-train seat-allocation locks from the JVM to Redis or the database, so allocation stays correct when the booking service runs as many tasks.
 - **Observability.** Amazon Managed Service for Prometheus and Grafana dashboards, plus distributed tracing.
 - **Multi-cloud resilience.** Cross-cloud database failover (for example Azure Database for PostgreSQL) for disaster recovery.
-
----
-
-## Team
-
-| Name | Role |
-|---|---|
-| **Bhushan R Kaashyap** | Backend microservices (authentication, booking, payment, notification), event-driven design, AWS deployment |
-| Abhishek Gowda G D | Team member |
-| Abhishek M | Team member |
-| Bharath M N | Team member (frontend and deployment tooling) |
-
-**Guide:** Prof. Archana M, Assistant Professor, Department of CSE, Global Academy of Technology, Bengaluru.
-
----
-
-<div align="center">
-<sub>Built as a final-year B.E. project at Global Academy of Technology, Bengaluru (affiliated to VTU, Belagavi).</sub>
-</div>
