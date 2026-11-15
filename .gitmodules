@@ -10,3 +10,7 @@
 	path = services/payment-service
 	url = https://github.com/bhushanrkashyap/payment_service.git
 	branch = main
+[submodule "services/notification-service"]
+	path = services/notification-service
+	url = https://github.com/bhushanrkashyap/notification_service.git
+	branch = main
