@@ -2,3 +2,7 @@
 	path = services/authentication-service
 	url = https://github.com/bhushanrkashyap/authentication_service.git
 	branch = main
+[submodule "services/booking-service"]
+	path = services/booking-service
+	url = https://github.com/bhushanrkashyap/booking_service.git
+	branch = main
